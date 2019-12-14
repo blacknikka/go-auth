@@ -4,7 +4,7 @@ app:
       - '5000:5000'
       - '2345:2345'
     volumes:
-      - './src:/go/app'
+      - './src:/go/src/github.com/blacknikka/go-auth'
     privileged: true
     tty: true
     security_opt:
