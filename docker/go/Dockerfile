@@ -1,9 +1,9 @@
 FROM golang:1.13.4-buster
 
-WORKDIR /go
+WORKDIR /go/src/github.com/blacknikka/go-auth
 
 RUN go get -u github.com/go-delve/delve/cmd/dlv
 
 ENV PATH $PATH:/go/bin
 
-CMD ["go", "run", "./app/main.go"]
+CMD ["go", "run", "./main.go"]
