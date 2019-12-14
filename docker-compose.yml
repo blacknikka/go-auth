@@ -1,0 +1,15 @@
+app:
+    build: ./docker/go
+    ports:
+      - '5000:5000'
+      - '2345:2345'
+    volumes:
+      - './src:/go/app'
+    privileged: true
+    tty: true
+    security_opt:
+      - apparmor:unconfined
+    cap_add:
+      - SYS_PTRACE
+    # command: dlv debug ./app/main.go --headless --listen=:2345 --log --api-version=2
+  
