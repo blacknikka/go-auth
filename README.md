@@ -1,0 +1,2 @@
+# overview
+Go auth sample.
