@@ -4,10 +4,10 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/blacknikka/go-auth/controllers"
+	"github.com/blacknikka/go-auth/handlers"
 )
 
 func main() {
-	controllers.InitializeRouting()
+	handlers.InitializeRouting()
 	log.Fatal(http.ListenAndServe(":5000", nil))
 }
