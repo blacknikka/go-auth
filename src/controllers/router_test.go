@@ -1,13 +1,15 @@
 package controllers
 
 import (
+	"bytes"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
 func TestRouting(t *testing.T) {
-	t.Run("/hello", func(t *testing.T) {
+	t.Run("GET /hello", func(t *testing.T) {
 		// https://blog.questionable.services/article/testing-http-handlers-go/
 		// 参考に実装.
 
@@ -33,6 +35,42 @@ func TestRouting(t *testing.T) {
 		// Check the response body is what we expect.
 		expected := `hello, world!`
 		if rr.Body.String() != expected {
+			t.Errorf("handler returned unexpected body: got %v want %v",
+				rr.Body.String(), expected)
+		}
+	})
+
+	t.Run("POST /hello", func(t *testing.T) {
+		jsonObject := JSONRequest{Name: "my-name"}
+		jsonString, err := json.Marshal(jsonObject)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		req, err := http.NewRequest(
+			"POST",
+			"/hello",
+			bytes.NewBuffer(jsonString))
+
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(HelloJSONHandle)
+		handler.ServeHTTP(rr, req)
+
+		if status := rr.Code; status != http.StatusOK {
+			t.Errorf("handler returned wrong status code: got %v want %v",
+				status, http.StatusOK)
+		}
+
+		expected, err := json.Marshal(JSONResponse{Message: "hello my-name"})
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if rr.Body.String() != string(expected) {
 			t.Errorf("handler returned unexpected body: got %v want %v",
 				rr.Body.String(), expected)
 		}
