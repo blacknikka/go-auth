@@ -1,5 +1,6 @@
 app:
     build: ./docker/go
+    env_file: .env
     ports:
       - '5000:5000'
       - '2345:2345'
@@ -14,11 +15,12 @@ app:
     command: realize start --run --no-config
 mysql:
     build: ./docker/mysql
+    env_file: .env
     ports:
       - '3306:3306'
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: db
-      MYSQL_USER: mysql
-      MYSQL_PASSWORD: secret
-      TZ: 'Asia/Tokyo'
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${DB_USER_NAME}
+      MYSQL_PASSWORD: ${DB_USER_PASSWORD}
+      TZ: ${MYSQL_TIMEZONE}
