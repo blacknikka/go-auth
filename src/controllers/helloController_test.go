@@ -8,8 +8,8 @@ import (
 	"testing"
 )
 
-func TestRouting(t *testing.T) {
-	t.Run("GET /hello", func(t *testing.T) {
+func TestHelloController(t *testing.T) {
+	t.Run("GET HelloServer", func(t *testing.T) {
 		// https://blog.questionable.services/article/testing-http-handlers-go/
 		// 参考に実装.
 
@@ -40,7 +40,7 @@ func TestRouting(t *testing.T) {
 		}
 	})
 
-	t.Run("POST /hello", func(t *testing.T) {
+	t.Run("POST HelloJSONHandle", func(t *testing.T) {
 		jsonObject := JSONRequest{Name: "my-name"}
 		jsonString, err := json.Marshal(jsonObject)
 		if err != nil {
