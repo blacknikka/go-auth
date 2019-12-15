@@ -11,5 +11,4 @@ app:
       - apparmor:unconfined
     cap_add:
       - SYS_PTRACE
-    # command: dlv debug ./app/main.go --headless --listen=:2345 --log --api-version=2
-  
+    command: realize start --run --no-config
