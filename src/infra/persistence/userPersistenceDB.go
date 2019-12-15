@@ -2,10 +2,8 @@ package persistence
 
 import (
 	"context"
-	"os"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/jinzhu/gorm"
 
 	"github.com/blacknikka/go-auth/domain/models/users"
 	"github.com/blacknikka/go-auth/domain/repositories"
@@ -21,20 +19,13 @@ func NewUserPersistence() repositories.UserRepository {
 
 // GetAll すべてを取得する
 func (userDB UserPersistanceDB) GetAll(context.Context) ([]*users.User, error) {
-	user := os.Getenv("DB_USER_NAME")
-	password := os.Getenv("DB_USER_PASSWORD")
-	host := "tcp(" + os.Getenv("DB_HOST") + ":3306)"
-	dbTable := os.Getenv("MYSQL_DATABASE")
-	connString := user + ":" + password + "@" + host + "/" + dbTable + "?charset=utf8&parseTime=True&loc=Local"
-
-	db, err := gorm.Open(
-		"mysql",
-		connString)
-	defer db.Close()
-
+	conn := NewConnectToDB()
+	db, err := conn.Connect()
 	if err != nil {
 		panic(err.Error())
 	}
+
+	defer db.Close()
 
 	user1 := users.User{
 		Name:  "namae",
