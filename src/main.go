@@ -8,6 +8,6 @@ import (
 )
 
 func main() {
-	http.HandleFunc("/hello", controllers.HelloServer)
+	controllers.InitializeRouting()
 	log.Fatal(http.ListenAndServe(":5000", nil))
 }
