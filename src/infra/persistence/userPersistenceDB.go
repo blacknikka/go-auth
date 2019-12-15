@@ -10,8 +10,8 @@ import (
 // UserPersistanceDB DBでの永続化を行う
 type UserPersistanceDB struct{}
 
-// NewUserPersistance 永続化Objectを返す
-func NewUserPersistance() repositories.UserRepository {
+// NewUserPersistence 永続化Objectを返す
+func NewUserPersistence() repositories.UserRepository {
 	return &UserPersistanceDB{}
 }
 
