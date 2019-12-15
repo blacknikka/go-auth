@@ -12,3 +12,13 @@ app:
     cap_add:
       - SYS_PTRACE
     command: realize start --run --no-config
+mysql:
+    build: ./docker/mysql
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db
+      MYSQL_USER: mysql
+      MYSQL_PASSWORD: secret
+      TZ: 'Asia/Tokyo'
