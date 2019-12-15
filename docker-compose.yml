@@ -1,4 +1,6 @@
-app:
+version: '2'
+services:
+  app:
     build: ./docker/go
     env_file: .env
     ports:
@@ -13,7 +15,7 @@ app:
     cap_add:
       - SYS_PTRACE
     command: realize start --run --no-config
-mysql:
+  mysql:
     build: ./docker/mysql
     env_file: .env
     ports:
