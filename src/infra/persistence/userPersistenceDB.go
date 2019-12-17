@@ -29,8 +29,13 @@ func (userDB UserPersistanceDB) GetAll(context.Context) ([]*users.User, error) {
 
 	user1 := users.User{
 		Name:  "namae",
-		Email: users.Email{Email: "user1@example.com"},
+		Email: "user1@example.com",
 	}
 
 	return []*users.User{&user1}, nil
+}
+
+// CreateUser ユーザー作成
+func (userDB UserPersistanceDB) CreateUser(users.User) error {
+	return nil
 }

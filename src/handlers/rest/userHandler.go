@@ -52,7 +52,7 @@ func (uh userHandler) Index(w http.ResponseWriter, r *http.Request) {
 		uf := &userField{
 			Name: user.Name,
 			Email: emailField{
-				Email: user.Email.Email,
+				Email: user.Email,
 			},
 		}
 		res.Users = append(res.Users, *uf)

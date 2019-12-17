@@ -17,6 +17,11 @@ func main() {
 
 	defer db.Close()
 
+	// Check if the table exists
+	if db.HasTable(&users.User{}) {
+		db.DropTable(&users.User{})
+	}
+
 	// Migrate
 	db.AutoMigrate(&users.User{})
 }
