@@ -1,24 +1,12 @@
 package users
 
-// UserID id
-type UserID struct {
-	ID int
-}
+import (
+	_ "github.com/jinzhu/gorm/dialects/mysql"
+)
 
 // User user info
 type User struct {
-	Name  string
-	Email Email
-}
-
-// Email email
-type Email struct {
-	Email string
-}
-
-// CreateUser create user
-func (user *User) CreateUser() *UserID {
-	userID := &UserID{1}
-
-	return userID
+	ID    int64  `gorm:"column:id;primary_key"`
+	Name  string `gorm:"column:name" sql:"not null;type:varchar(256)"`
+	Email string `gorm:"column:email" sql:"not null;type:varchar(256)"`
 }
