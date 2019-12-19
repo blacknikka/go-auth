@@ -2,8 +2,10 @@ package persistence
 
 import (
 	"context"
+	"errors"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jinzhu/gorm"
 
 	"github.com/blacknikka/go-auth/domain/models/users"
 	"github.com/blacknikka/go-auth/domain/repositories"
@@ -36,6 +38,9 @@ func (userDB UserPersistanceDB) GetAll(context.Context) ([]*users.User, error) {
 }
 
 // CreateUser ユーザー作成
-func (userDB UserPersistanceDB) CreateUser(users.User) error {
+func (userDB UserPersistanceDB) CreateUser(db *gorm.DB, user users.User) error {
+	if result := db.NewRecord(user); result == false {
+		return errors.New("Create user failed.")
+	}
 	return nil
 }
