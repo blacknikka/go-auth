@@ -1,22 +1,43 @@
 package persistence
 
 import (
+	"os"
 	"testing"
 
 	"github.com/blacknikka/go-auth/domain/models/users"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jinzhu/gorm"
 )
+
+var db *gorm.DB
+
+func setup() {
+	// DBに接続
+	conn := NewConnectToDB()
+	var err error
+	db, err = conn.Connect()
+	if err != nil {
+		panic("Connect to DB failed.")
+	}
+
+	db.Delete(&users.User{})
+}
+
+func teardown() {
+	defer db.Close()
+}
+
+func TestMain(m *testing.M) {
+	setup()
+	ret := m.Run()
+	if ret == 0 {
+		teardown()
+	}
+	os.Exit(ret)
+}
 
 func TestDB(t *testing.T) {
 	t.Run("CreateUser正常系", func(t *testing.T) {
-		// DBに接続
-		conn := NewConnectToDB()
-		db, err := conn.Connect()
-		defer db.Close()
-		if err != nil {
-			t.Fatal("Connect to DB failed.")
-		}
-
 		// DBの登録数を取得
 		var count = 0
 		db.Model(&users.User{}).Count(&count)
@@ -33,7 +54,7 @@ func TestDB(t *testing.T) {
 			Name:  "user1",
 			Email: "user1@example.com",
 		}
-		err = userDB.CreateUser(db, user)
+		err := userDB.CreateUser(db, user)
 		if err != nil {
 			t.Error("insert error")
 		}
