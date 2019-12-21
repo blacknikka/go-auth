@@ -40,7 +40,8 @@ func (userDB UserPersistanceDB) GetAll(context.Context) ([]*users.User, error) {
 // CreateUser ユーザー作成
 func (userDB UserPersistanceDB) CreateUser(db *gorm.DB, user users.User) error {
 	if result := db.NewRecord(user); result == false {
-		return errors.New("Create user failed.")
+		return errors.New("create user failed")
 	}
+	db.Create(&user)
 	return nil
 }
