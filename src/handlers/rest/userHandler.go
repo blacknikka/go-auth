@@ -16,6 +16,24 @@ type userHandler struct {
 	userUseCase usecases.UserUseCase
 }
 
+// ------------------
+
+// EmailField email
+type EmailField struct {
+	Email string `json:"email"`
+}
+
+// UserField ユーザー情報
+type UserField struct {
+	Name  string     `json:"name"`
+	Email EmailField `json:"email"`
+}
+
+// Response ユーザー情報配列
+type Response struct {
+	Users []UserField `json`
+}
+
 // NewUserHandler Userのハンドラを返す
 func NewUserHandler(uu usecases.UserUseCase) UserHandler {
 	return &userHandler{
@@ -25,18 +43,6 @@ func NewUserHandler(uu usecases.UserUseCase) UserHandler {
 
 // Index UserのIndexの処理
 func (uh userHandler) Index(w http.ResponseWriter, r *http.Request) {
-	type emailField struct {
-		Email string `json:"email"`
-	}
-
-	type userField struct {
-		Name  string     `json:"name"`
-		Email emailField `json:"email"`
-	}
-
-	type response struct {
-		Users []userField `json`
-	}
 
 	ctx := r.Context()
 	users, err := uh.userUseCase.GetAll(ctx)
@@ -47,11 +53,11 @@ func (uh userHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 取得したドメインモデルを response に変換
-	res := new(response)
+	res := new(Response)
 	for _, user := range users {
-		uf := &userField{
+		uf := &UserField{
 			Name: user.Name,
-			Email: emailField{
+			Email: EmailField{
 				Email: user.Email,
 			},
 		}
