@@ -9,6 +9,11 @@ import (
 	"github.com/blacknikka/go-auth/infra/persistence"
 )
 
+var (
+	// ErrConnectingToDB is an error message for connection failed.
+    ErrConnectingToDB = errors.New("Connect to DB failed.")
+)
+
 // UserUseCase Userのユースケース
 type UserUseCase interface {
 	GetAll(context.Context) ([]*users.User, error)
@@ -40,7 +45,7 @@ func (uu userUseCase) CreateUser(user users.User) error {
 	db, err := conn.Connect()
 	defer db.Close()
 	if err != nil {
-		errors.New("Connect to DB failed.")
+		return ErrConnectingToDB
 	}
 
 	return uu.userRepository.CreateUser(db, user)

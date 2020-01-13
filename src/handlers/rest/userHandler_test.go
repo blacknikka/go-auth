@@ -3,6 +3,7 @@ package rest
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -11,37 +12,42 @@ import (
 )
 
 // for mock
-type spyUserUseCase struct {
+type fakeUserUseCase struct {
+	FakeGetAll func(context.Context) ([]*users.User, error)
 }
 
-func (s *spyUserUseCase) GetAll(context.Context) ([]*users.User, error) {
-	mockedUsersData := []users.User{
-		{
-			ID:    1,
-			Name:  "name",
-			Email: "name@example.com",
-		},
-		{
-			ID:    2,
-			Name:  "ore",
-			Email: "ore@example.com",
-		},
-	}
-
-	return []*users.User{&mockedUsersData[0], &mockedUsersData[1]}, nil
+func (s *fakeUserUseCase) GetAll(ctx context.Context) ([]*users.User, error) {
+	return s.FakeGetAll(ctx)
 }
 
 func TestUserController(t *testing.T) {
 	t.Run("GET Index", func(t *testing.T) {
+		// DI (UserUseCase)
+		spy := &fakeUserUseCase{
+			FakeGetAll: func(context.Context) ([]*users.User, error) {
+				mockedUsersData := []users.User{
+					{
+						ID:    1,
+						Name:  "name",
+						Email: "name@example.com",
+					},
+					{
+						ID:    2,
+						Name:  "ore",
+						Email: "ore@example.com",
+					},
+				}
+
+				return []*users.User{&mockedUsersData[0], &mockedUsersData[1]}, nil
+			},
+		}
+
+		userHandler := NewUserHandler(spy)
 
 		req, err := http.NewRequest("GET", "/user", nil)
 		if err != nil {
 			t.Fatal(err)
 		}
-
-		// DI (UserUseCase)
-		spy := new(spyUserUseCase)
-		userHandler := NewUserHandler(spy)
 
 		// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
 		rr := httptest.NewRecorder()
@@ -83,5 +89,36 @@ func TestUserController(t *testing.T) {
 				t.Errorf("Email: got %v want %v", responsedUsers.Users[index].Email, "name@example.com")
 			}
 		}
+	})
+
+	t.Run("GET Index error pattern", func(t *testing.T) {
+		spy := &fakeUserUseCase{
+			FakeGetAll: func(context.Context) ([]*users.User, error) {
+				return nil, errors.New("connection failed.")
+			},
+		}
+
+		// inject a mock object.
+		userHandler := NewUserHandler(spy)
+
+		req, err := http.NewRequest("GET", "/user", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(userHandler.Index)
+
+		// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
+		// directly and pass in our Request and ResponseRecorder.
+		handler.ServeHTTP(rr, req)
+
+		// Check the status code is what we expect.
+		if status := rr.Code; status != http.StatusInternalServerError {
+			t.Errorf("handler returned wrong status code: got %v want %v",
+				status, http.StatusInternalServerError)
+		}
+
 	})
 }
