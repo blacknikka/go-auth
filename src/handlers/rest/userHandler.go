@@ -48,7 +48,7 @@ func (uh userHandler) Index(w http.ResponseWriter, r *http.Request) {
 	users, err := uh.userUseCase.GetAll(ctx)
 	if err != nil {
 		// TODO: エラーハンドリングをきちんとする
-		http.Error(w, "Internal Server Error", 500)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
