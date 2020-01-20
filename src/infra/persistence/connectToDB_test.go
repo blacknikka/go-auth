@@ -50,8 +50,8 @@ func TestConnectToDB(t *testing.T) {
 			t.Error("In this case, connectToDB.Connect() should return nil value of *gorm.DB")
 		}
 
-		if err == nil {
-			t.Error("In this case, connectToDB.Connect() should return NOT nil value of error")
+		if err != ErrDBOpen {
+			t.Errorf("got error %q want %q", err, ErrDBOpen)
 		}
 	})
 }

@@ -8,6 +8,11 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+var (
+	// ErrDBOpen is an error message for opening the DB conneciton.
+    ErrDBOpen = errors.New("When the DB connection is opened, an error is occurred")
+)
+
 // ConnectToDB DB接続
 type ConnectToDB interface {
 	Connect() (*gorm.DB, error)
@@ -35,7 +40,7 @@ func (conn connectToDB) Connect() (*gorm.DB, error) {
 	db, err := conn.dbConnection.Open("mysql", connString)
 
 	if err != nil {
-		return nil, errors.New("DB接続失敗")
+		return nil, ErrDBOpen
 	}
 
 	return db, nil
