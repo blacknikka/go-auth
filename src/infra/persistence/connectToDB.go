@@ -14,11 +14,15 @@ type ConnectToDB interface {
 }
 
 // NewConnectToDB DB接続のstruct
-func NewConnectToDB() ConnectToDB {
-	return &connectToDB{}
+func NewConnectToDB(dbConnection DBConnectionFactory) ConnectToDB {
+	return &connectToDB{
+		dbConnection: dbConnection,
+	}
 }
 
-type connectToDB struct{}
+type connectToDB struct{
+	dbConnection DBConnectionFactory
+}
 
 // Connect すべてを取得する
 func (conn connectToDB) Connect() (*gorm.DB, error) {
@@ -28,9 +32,7 @@ func (conn connectToDB) Connect() (*gorm.DB, error) {
 	dbTable := os.Getenv("MYSQL_DATABASE")
 	connString := user + ":" + password + "@" + host + "/" + dbTable + "?charset=utf8&parseTime=True&loc=Local"
 
-	db, err := gorm.Open(
-		"mysql",
-		connString)
+	db, err := conn.dbConnection.Open("mysql", connString)
 
 	if err != nil {
 		return nil, errors.New("DB接続失敗")

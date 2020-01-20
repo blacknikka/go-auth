@@ -21,7 +21,7 @@ func NewUserPersistence() repositories.UserRepository {
 
 // GetAll すべてを取得する
 func (userDB UserPersistanceDB) GetAll(context.Context) ([]*users.User, error) {
-	conn := NewConnectToDB()
+	conn := NewConnectToDB(NewDBConnectionFactory())
 	db, err := conn.Connect()
 	if err != nil {
 		panic(err.Error())
