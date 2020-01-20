@@ -13,7 +13,7 @@ var db *gorm.DB
 
 func setup() {
 	// DBに接続
-	conn := NewConnectToDB()
+	conn := NewConnectToDB(NewDBConnectionFactory())
 	var err error
 	db, err = conn.Connect()
 	if err != nil {

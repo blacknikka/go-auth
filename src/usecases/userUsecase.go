@@ -41,7 +41,7 @@ func (uu userUseCase) GetAll(ctx context.Context) ([]*users.User, error) {
 
 // CreateUser ユーザを作成する
 func (uu userUseCase) CreateUser(user users.User) error {
-	conn := persistence.NewConnectToDB()
+	conn := persistence.NewConnectToDB(persistence.NewDBConnectionFactory())
 	db, err := conn.Connect()
 	defer db.Close()
 	if err != nil {

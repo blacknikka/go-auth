@@ -9,7 +9,7 @@ import (
 
 func main() {
 
-	conn := persistence.NewConnectToDB()
+	conn := persistence.NewConnectToDB(persistence.NewDBConnectionFactory())
 	db, err := conn.Connect()
 	if err != nil {
 		panic(err.Error())
