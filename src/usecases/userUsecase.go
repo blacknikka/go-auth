@@ -6,7 +6,6 @@ import (
 
 	"github.com/blacknikka/go-auth/domain/models/users"
 	"github.com/blacknikka/go-auth/domain/repositories"
-	"github.com/blacknikka/go-auth/infra/persistence"
 )
 
 var (
@@ -16,7 +15,7 @@ var (
 
 // UserUseCase Userのユースケース
 type UserUseCase interface {
-	GetAll(context.Context) ([]*users.User, error)
+	GetAll(context.Context) ([]users.User, error)
 }
 
 type userUseCase struct {
@@ -31,7 +30,7 @@ func NewUserUseCase(userRepository repositories.UserRepository) UserUseCase {
 }
 
 // GetAll 全ユーザ取得する
-func (uu userUseCase) GetAll(ctx context.Context) ([]*users.User, error) {
+func (uu userUseCase) GetAll(ctx context.Context) ([]users.User, error) {
 	users, err := uu.userRepository.GetAll(ctx)
 	if err != nil {
 		return nil, err
@@ -41,12 +40,5 @@ func (uu userUseCase) GetAll(ctx context.Context) ([]*users.User, error) {
 
 // CreateUser ユーザを作成する
 func (uu userUseCase) CreateUser(user users.User) error {
-	conn := persistence.NewConnectToDB(persistence.NewDBConnectionFactory())
-	db, err := conn.Connect()
-	defer db.Close()
-	if err != nil {
-		return ErrConnectingToDB
-	}
-
-	return uu.userRepository.CreateUser(db, user)
+	return uu.userRepository.CreateUser(user)
 }

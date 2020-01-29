@@ -49,12 +49,12 @@ func TestDB(t *testing.T) {
 		}
 
 		// CreateUser
-		userDB := &UserPersistanceDB{}
+		userDB := &UserPersistanceDB{db: db}
 		user := users.User{
 			Name:  "user1",
 			Email: "user1@example.com",
 		}
-		err := userDB.CreateUser(db, user)
+		err := userDB.CreateUser(user)
 		if err != nil {
 			t.Error("insert error")
 		}
