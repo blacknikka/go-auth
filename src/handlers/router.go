@@ -10,7 +10,13 @@ import (
 
 // InitializeRouting routing
 func InitializeRouting() {
-	userPersistence := persistence.NewUserPersistence()
+	conn := persistence.NewConnectToDB(persistence.NewDBConnectionFactory())
+	db, err := conn.Connect()
+	if err != nil {
+		panic(err.Error())
+	}
+
+	userPersistence := persistence.NewUserPersistence(db)
 	userUseCase := usecases.UserUseCase(userPersistence)
 	userHandler := rest.NewUserHandler(userUseCase)
 

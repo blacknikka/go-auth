@@ -12,36 +12,30 @@ import (
 )
 
 // UserPersistanceDB DBでの永続化を行う
-type UserPersistanceDB struct{}
+type UserPersistanceDB struct{
+	db *gorm.DB
+}
 
 // NewUserPersistence 永続化Objectを返す
-func NewUserPersistence() repositories.UserRepository {
-	return &UserPersistanceDB{}
+func NewUserPersistence(db *gorm.DB) repositories.UserRepository {
+	return &UserPersistanceDB{
+		db: db,
+	}
 }
 
 // GetAll すべてを取得する
-func (userDB UserPersistanceDB) GetAll(context.Context) ([]*users.User, error) {
-	conn := NewConnectToDB(NewDBConnectionFactory())
-	db, err := conn.Connect()
-	if err != nil {
-		panic(err.Error())
-	}
+func (userDB UserPersistanceDB) GetAll(context.Context) ([]users.User, error) {
+	users := []users.User{}
+	userDB.db.Find(&users)
 
-	defer db.Close()
-
-	user1 := users.User{
-		Name:  "namae",
-		Email: "user1@example.com",
-	}
-
-	return []*users.User{&user1}, nil
+	return users, nil
 }
 
 // CreateUser ユーザー作成
-func (userDB UserPersistanceDB) CreateUser(db *gorm.DB, user users.User) error {
-	if result := db.NewRecord(user); result == false {
+func (userDB UserPersistanceDB) CreateUser(user users.User) error {
+	if result := userDB.db.NewRecord(user); result == false {
 		return errors.New("create user failed")
 	}
-	db.Create(&user)
+	userDB.db.Create(&user)
 	return nil
 }
