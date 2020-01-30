@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -13,18 +12,18 @@ import (
 
 // for mock
 type fakeUserUseCase struct {
-	FakeGetAll func(context.Context) ([]users.User, error)
+	FakeGetAll func() ([]users.User, error)
 }
 
-func (s *fakeUserUseCase) GetAll(ctx context.Context) ([]users.User, error) {
-	return s.FakeGetAll(ctx)
+func (s *fakeUserUseCase) GetAll() ([]users.User, error) {
+	return s.FakeGetAll()
 }
 
 func TestUserController(t *testing.T) {
 	t.Run("GET Index", func(t *testing.T) {
 		// DI (UserUseCase)
 		spy := &fakeUserUseCase{
-			FakeGetAll: func(context.Context) ([]users.User, error) {
+			FakeGetAll: func() ([]users.User, error) {
 				mockedUsersData := []users.User{
 					{
 						ID:    1,
@@ -93,7 +92,7 @@ func TestUserController(t *testing.T) {
 
 	t.Run("GET Index error pattern", func(t *testing.T) {
 		spy := &fakeUserUseCase{
-			FakeGetAll: func(context.Context) ([]users.User, error) {
+			FakeGetAll: func() ([]users.User, error) {
 				return nil, errors.New("connection failed.")
 			},
 		}

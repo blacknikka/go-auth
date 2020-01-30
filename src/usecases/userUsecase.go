@@ -1,7 +1,6 @@
 package usecases
 
 import (
-	"context"
 	"errors"
 
 	"github.com/blacknikka/go-auth/domain/models/users"
@@ -10,12 +9,12 @@ import (
 
 var (
 	// ErrConnectingToDB is an error message for connection failed.
-    ErrConnectingToDB = errors.New("Connect to DB failed.")
+	ErrConnectingToDB = errors.New("Connect to DB failed.")
 )
 
 // UserUseCase Userのユースケース
 type UserUseCase interface {
-	GetAll(context.Context) ([]users.User, error)
+	GetAll() ([]users.User, error)
 }
 
 type userUseCase struct {
@@ -30,8 +29,8 @@ func NewUserUseCase(userRepository repositories.UserRepository) UserUseCase {
 }
 
 // GetAll 全ユーザ取得する
-func (uu userUseCase) GetAll(ctx context.Context) ([]users.User, error) {
-	users, err := uu.userRepository.GetAll(ctx)
+func (uu userUseCase) GetAll() ([]users.User, error) {
+	users, err := uu.userRepository.GetAll()
 	if err != nil {
 		return nil, err
 	}
@@ -39,6 +38,6 @@ func (uu userUseCase) GetAll(ctx context.Context) ([]users.User, error) {
 }
 
 // CreateUser ユーザを作成する
-func (uu userUseCase) CreateUser(user users.User) error {
+func (uu userUseCase) CreateUser(user users.User) (uses.User, error) {
 	return uu.userRepository.CreateUser(user)
 }
