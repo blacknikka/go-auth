@@ -43,9 +43,7 @@ func NewUserHandler(uu usecases.UserUseCase) UserHandler {
 
 // Index UserのIndexの処理
 func (uh userHandler) Index(w http.ResponseWriter, r *http.Request) {
-
-	ctx := r.Context()
-	users, err := uh.userUseCase.GetAll(ctx)
+	users, err := uh.userUseCase.GetAll()
 	if err != nil {
 		// TODO: エラーハンドリングをきちんとする
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
