@@ -60,4 +60,6 @@ jobs:
           working_directory: /home/circleci/project
 
       # test
-      - run: go test -v ./...
+      - run:
+          name: Test
+          command: docker-compose exec app sh -c "go test -v ./..."
