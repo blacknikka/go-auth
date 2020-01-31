@@ -38,6 +38,6 @@ func (uu userUseCase) GetAll() ([]users.User, error) {
 }
 
 // CreateUser ユーザを作成する
-func (uu userUseCase) CreateUser(user users.User) (uses.User, error) {
+func (uu userUseCase) CreateUser(user users.User) (users.User, error) {
 	return uu.userRepository.CreateUser(user)
 }

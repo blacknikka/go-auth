@@ -120,4 +120,29 @@ func TestFindByID(t *testing.T) {
 			t.Errorf("err should be nil, but %v", err)
 		}
 	})
+
+	t.Run("FindByID異常系", func(t *testing.T) {
+		// DBを空にする
+		db.Delete(&users.User{})
+
+		// Userの登録
+		userDB := &UserPersistanceDB{db: db}
+		targetUser := users.User{
+			Name:  "user1",
+			Email: "user1@example.com",
+		}
+		createdUser, _ := userDB.CreateUser(targetUser)
+
+		// find(存在しないIDを指定する)
+		foundUser, err := userDB.FindByID(int(createdUser.ID + 1))
+
+		if foundUser.ID > 0 {
+			t.Errorf("Since the ID is invalid, user should be default value(ID should be 0): %v", foundUser)
+		}
+
+		if err == nil {
+			t.Errorf("Error shouldn't be nil: %v", err)
+		}
+	})
+
 }

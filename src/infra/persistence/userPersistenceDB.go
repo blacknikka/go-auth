@@ -35,6 +35,10 @@ func (userDB UserPersistanceDB) FindByID(id int) (users.User, error) {
 	user := users.User{}
 	userDB.db.First(&user, id)
 
+	if user.ID <= 0 {
+		return users.User{}, errors.New("User not found")
+	}
+
 	return user, nil
 }
 
