@@ -40,13 +40,6 @@ jobs:
             docker-compose exec app sh -c "curl -L https://github.com/golang-migrate/migrate/releases/download/v4.8.0/migrate.linux-amd64.tar.gz | tar xvz"
           working_directory: /home/circleci/project
 
-      # Add $PATH
-      - run:
-          name: Add $PATH
-          command: |
-            docker-compose exec app sh -c "PATH=$PATH:/go/src/github.com/blacknikka/go-auth sh ./migrate/up.sh"
-          working_directory: /home/circleci/project
-
       # Wait for MySQL
       - run:
           name: Waiting for MySQL to be ready
@@ -61,9 +54,10 @@ jobs:
 
       # Migrate
       - run:
-          name: Migrate database
+          name: Migrate
           command: |
-            sh ./src/migrate/up.sh
+            docker-compose exec app sh -c "PATH=$PATH:/go/src/github.com/blacknikka/go-auth sh ./migrate/up.sh"
+          working_directory: /home/circleci/project
 
       # test
       - run: go test -v ./...
