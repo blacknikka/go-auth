@@ -150,3 +150,44 @@ func TestFindByID(t *testing.T) {
 	})
 
 }
+
+func TestUpdateUser(t *testing.T) {
+	t.Run("UpdateUser正常系", func(t *testing.T) {
+		// DBを空にする
+		db.Delete(&users.User{})
+
+		// Userの登録
+		userDB := &UserPersistanceDB{db: db}
+		targetUser := users.User{
+			Name:  "user1",
+			Email: "user1@example.com",
+		}
+		createdUser, _ := userDB.CreateUser(targetUser)
+
+		// User情報の更新
+		targetUser.Name = "my-name"
+		updatedUser, err := userDB.UpdateUser(*createdUser)
+
+		if updatedUser.Name != "my-name" && 
+			updatedUser.Email != "user1@example.com" {
+			t.Errorf("Update failed: %v", updatedUser)
+		}
+
+		if err != nil {
+			t.Errorf("err should be nil: %v", err)
+		}
+
+		updatedUser.Email = "my-name@example.com"
+		updatedUser, err = userDB.UpdateUser(*updatedUser)
+
+		if updatedUser.Name != "my-name" && 
+			updatedUser.Email != "my-name@example.com" {
+			t.Errorf("Update failed: %v", updatedUser)
+		}
+
+		if err != nil {
+			t.Errorf("err should be nil: %v", err)
+		}
+
+	})
+}
