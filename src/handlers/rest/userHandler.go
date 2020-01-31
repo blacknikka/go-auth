@@ -52,7 +52,7 @@ func (uh userHandler) Index(w http.ResponseWriter, r *http.Request) {
 
 	// 取得したドメインモデルを response に変換
 	res := new(Response)
-	for _, user := range users {
+	for _, user := range *users {
 		uf := &UserField{
 			Name: user.Name,
 			Email: EmailField{

@@ -23,30 +23,30 @@ func NewUserPersistence(db *gorm.DB) repositories.UserRepository {
 }
 
 // GetAll すべてを取得する
-func (userDB UserPersistanceDB) GetAll() ([]users.User, error) {
+func (userDB UserPersistanceDB) GetAll() (*[]users.User, error) {
 	users := []users.User{}
 	userDB.db.Find(&users)
 
-	return users, nil
+	return &users, nil
 }
 
 // FindByID IdからUserを取得する
-func (userDB UserPersistanceDB) FindByID(id int) (users.User, error) {
+func (userDB UserPersistanceDB) FindByID(id int) (*users.User, error) {
 	user := users.User{}
 	userDB.db.First(&user, id)
 
 	if user.ID <= 0 {
-		return users.User{}, errors.New("User not found")
+		return nil, errors.New("User not found")
 	}
 
-	return user, nil
+	return &user, nil
 }
 
 // CreateUser ユーザー作成
-func (userDB UserPersistanceDB) CreateUser(user users.User) (users.User, error) {
+func (userDB UserPersistanceDB) CreateUser(user users.User) (*users.User, error) {
 	if result := userDB.db.NewRecord(user); result == false {
-		return user, errors.New("create user failed")
+		return nil, errors.New("create user failed")
 	}
 	userDB.db.Create(&user)
-	return user, nil
+	return &user, nil
 }
