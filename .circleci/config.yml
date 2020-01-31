@@ -7,7 +7,6 @@ jobs:
     machine: true
     steps:
       - checkout
-      - run: go get -v -t -d ./...
 
       - run: cp ./env-sample ./.env
       - run:
@@ -26,6 +25,13 @@ jobs:
     #                 $(docker image ls --format="{{.Repository}}" | grep $(grep COMPOSE_PROJECT_NAME etc/env-example | sed s/.*=//g)_) \
     #             -o ~/caches/images.tar
     #         fi
+
+      - run:
+          name: Go get in Docker container
+          # -v : display commands
+          # -t : After download the package, do its unit test.
+          # -d : Only download, not build
+          command: docker-compose exec app go get -v -t -d ./...
 
       # Wait for MySQL
       - run:
