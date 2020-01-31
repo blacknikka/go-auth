@@ -1,0 +1,82 @@
+# Golang CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-go/ for more details
+version: 2
+jobs:
+  build:
+    machine: true
+    steps:
+      - checkout
+
+      - run: cp ./env-sample ./.env
+      - run:
+          name: Docker Image Rebuild
+          command: |
+            if [ ! -f ~/caches/images.tar ]; then
+                docker-compose up -d
+            fi
+          working_directory: ./
+    #   - run:
+    #       name: Save Docker Images
+    #       command: |
+    #         if [ ! -f ~/caches/images.tar ]; then
+    #             mkdir ~/caches
+    #             docker image save \
+    #                 $(docker image ls --format="{{.Repository}}" | grep $(grep COMPOSE_PROJECT_NAME etc/env-example | sed s/.*=//g)_) \
+    #             -o ~/caches/images.tar
+    #         fi
+
+      - run:
+          name: Go get in Docker container
+          # -v : display commands
+          # -t : After download the package, do its unit test.
+          # -d : Only download, not build
+          command: docker-compose exec app go get -v -t -d ./...
+
+      # install migrate
+      - run:
+          name: Install migration tool
+          command: |
+            docker-compose exec app sh -c "curl -L https://github.com/golang-migrate/migrate/releases/download/v4.8.0/migrate.linux-amd64.tar.gz | tar xvz"
+          working_directory: /home/circleci/project
+
+    #   # Wait for MySQL
+    #   - run:
+    #       name: Waiting for MySQL to be ready
+    #       command: |
+    #         for i in `seq 1 10`;
+    #         do
+    #           nc -z localhost 3306 && echo Success && exit 0
+    #           echo -n .
+    #           sleep 1
+    #         done
+    #         echo Failed waiting for MySQL &amp;&amp; exit 1
+
+      - run:
+          name: install dockerize
+          command: |
+            wget \
+                https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+            sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+            rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+          environment:
+            DOCKERIZE_VERSION: v0.6.1
+
+      - run:
+          name: Wait for db
+          command: dockerize -wait tcp://localhost:3306 -timeout 1m
+
+      # Migrate
+      - run:
+          name: Migrate
+          command: |
+            docker-compose exec app env
+            docker-compose ps
+            sleep 5; docker-compose exec app sh -c "PATH=$PATH:/go/src/github.com/blacknikka/go-auth sh ./migrate/up.sh"
+          working_directory: /home/circleci/project
+
+      # test
+      - run:
+          name: Test
+          command: |
+            docker-compose exec app sh -c "go test -v ./..."
