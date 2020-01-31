@@ -4,14 +4,46 @@
 version: 2
 jobs:
   build:
-    docker:
-      # specify the version
-      - image: circleci/golang:1.9
-
-    working_directory: /go/src/github.com/blacknikka/go-auth
+    machine: true
     steps:
       - checkout
-
-      # specify any bash command here prefixed with `run: `
       - run: go get -v -t -d ./...
+
+      - run: cp ./env-sample ./.env
+      - run:
+          name: Docker Image Rebuild
+          command: |
+            if [ ! -f ~/caches/images.tar ]; then
+                docker-compose up -d
+            fi
+          working_directory: ./
+    #   - run:
+    #       name: Save Docker Images
+    #       command: |
+    #         if [ ! -f ~/caches/images.tar ]; then
+    #             mkdir ~/caches
+    #             docker image save \
+    #                 $(docker image ls --format="{{.Repository}}" | grep $(grep COMPOSE_PROJECT_NAME etc/env-example | sed s/.*=//g)_) \
+    #             -o ~/caches/images.tar
+    #         fi
+
+      # Wait for MySQL
+      - run:
+          name: Waiting for MySQL to be ready
+          command: |
+            for i in `seq 1 10`;
+            do
+              nc -z localhost 3306 && echo Success && exit 0
+              echo -n .
+              sleep 1
+            done
+            echo Failed waiting for MySQL &amp;&amp; exit 1
+
+      # Migrate
+      - run:
+          name: Migrate database
+          command: |
+            sh ./migrate/up.sh
+
+      # test
       - run: go test -v ./...
