@@ -40,17 +40,31 @@ jobs:
             docker-compose exec app sh -c "curl -L https://github.com/golang-migrate/migrate/releases/download/v4.8.0/migrate.linux-amd64.tar.gz | tar xvz"
           working_directory: /home/circleci/project
 
-      # Wait for MySQL
+    #   # Wait for MySQL
+    #   - run:
+    #       name: Waiting for MySQL to be ready
+    #       command: |
+    #         for i in `seq 1 10`;
+    #         do
+    #           nc -z localhost 3306 && echo Success && exit 0
+    #           echo -n .
+    #           sleep 1
+    #         done
+    #         echo Failed waiting for MySQL &amp;&amp; exit 1
+
       - run:
-          name: Waiting for MySQL to be ready
+          name: install dockerize
           command: |
-            for i in `seq 1 10`;
-            do
-              nc -z localhost 3306 && echo Success && exit 0
-              echo -n .
-              sleep 1
-            done
-            echo Failed waiting for MySQL &amp;&amp; exit 1
+            wget \
+                https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+            sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+            rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+          environment:
+            DOCKERIZE_VERSION: v0.6.1
+
+      - run:
+          name: Wait for db
+          command: dockerize -wait tcp://localhost:3306 -timeout 1m
 
       # Migrate
       - run:
