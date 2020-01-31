@@ -62,4 +62,6 @@ jobs:
       # test
       - run:
           name: Test
-          command: docker-compose exec app sh -c "go test -v ./..."
+          command: |
+            docker-compose exec app env
+            docker-compose exec app sh -c "go test -v ./..."
