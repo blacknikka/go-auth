@@ -38,7 +38,8 @@ jobs:
           name: Install migration tool and add $PATH
           command: |
             curl -L https://github.com/golang-migrate/migrate/releases/download/v4.8.0/migrate.linux-amd64.tar.gz | tar xvz
-            export PATH=`pwd`:$PATH
+            echo export PATH=/home/circleci:$PATH >> ~/.bashrc
+          working_directory: /home/circleci
 
       # Wait for MySQL
       - run:
