@@ -39,6 +39,7 @@ jobs:
           command: |
             curl -L https://github.com/golang-migrate/migrate/releases/download/v4.8.0/migrate.linux-amd64.tar.gz | tar xvz
             echo export PATH=/home/circleci:$PATH >> ~/.bashrc
+            source ~/.bashrc
           working_directory: /home/circleci
 
       # Wait for MySQL
