@@ -33,11 +33,17 @@ jobs:
           # -d : Only download, not build
           command: docker-compose exec app go get -v -t -d ./...
 
-      # install migrate and add $PATH
+      # install migrate
       - run:
-          name: Install migration tool and add $PATH
+          name: Install migration tool
           command: |
             docker-compose exec app sh -c "curl -L https://github.com/golang-migrate/migrate/releases/download/v4.8.0/migrate.linux-amd64.tar.gz | tar xvz"
+          working_directory: /home/circleci/project
+
+      # Add $PATH
+      - run:
+          name: Add $PATH
+          command: |
             docker-compose exec app sh -c "PATH=$PATH:/go/src/github.com/blacknikka/go-auth sh ./migrate/up.sh"
           working_directory: /home/circleci/project
 
