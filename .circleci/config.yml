@@ -49,7 +49,7 @@ jobs:
       - run:
           name: Migrate database
           command: |
-            sh ./migrate/up.sh
+            sh ./src/migrate/up.sh
 
       # test
       - run: go test -v ./...
