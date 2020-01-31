@@ -14,7 +14,7 @@ var (
 
 // UserUseCase Userのユースケース
 type UserUseCase interface {
-	GetAll() ([]users.User, error)
+	GetAll() (*[]users.User, error)
 }
 
 type userUseCase struct {
@@ -29,7 +29,7 @@ func NewUserUseCase(userRepository repositories.UserRepository) UserUseCase {
 }
 
 // GetAll 全ユーザ取得する
-func (uu userUseCase) GetAll() ([]users.User, error) {
+func (uu userUseCase) GetAll() (*[]users.User, error) {
 	users, err := uu.userRepository.GetAll()
 	if err != nil {
 		return nil, err
@@ -38,6 +38,6 @@ func (uu userUseCase) GetAll() ([]users.User, error) {
 }
 
 // CreateUser ユーザを作成する
-func (uu userUseCase) CreateUser(user users.User) (users.User, error) {
+func (uu userUseCase) CreateUser(user users.User) (*users.User, error) {
 	return uu.userRepository.CreateUser(user)
 }

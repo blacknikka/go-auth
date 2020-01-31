@@ -103,6 +103,10 @@ func TestFindByID(t *testing.T) {
 		// IDで検索を行う（上記登録したUserで検索）
 		foundUser, err := userDB.FindByID(int(createdUser.ID))
 
+		if createdUser == nil {
+			t.Errorf("Found user shouldn't be nil: %v", foundUser)
+		}
+
 		if foundUser.ID != createdUser.ID {
 			t.Errorf("found user is invalid: got %v want %v",
 				foundUser, createdUser)
@@ -136,8 +140,8 @@ func TestFindByID(t *testing.T) {
 		// find(存在しないIDを指定する)
 		foundUser, err := userDB.FindByID(int(createdUser.ID + 1))
 
-		if foundUser.ID > 0 {
-			t.Errorf("Since the ID is invalid, user should be default value(ID should be 0): %v", foundUser)
+		if foundUser != nil {
+			t.Errorf("Since the ID is invalid, user should be nil: %v", foundUser)
 		}
 
 		if err == nil {
