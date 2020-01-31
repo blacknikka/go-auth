@@ -56,6 +56,7 @@ jobs:
       - run:
           name: Migrate
           command: |
+            docker-compose exec app env
             sleep 2; docker-compose exec app sh -c "PATH=$PATH:/go/src/github.com/blacknikka/go-auth sh ./migrate/up.sh"
           working_directory: /home/circleci/project
 
@@ -63,5 +64,4 @@ jobs:
       - run:
           name: Test
           command: |
-            docker-compose exec app env
             docker-compose exec app sh -c "go test -v ./..."
