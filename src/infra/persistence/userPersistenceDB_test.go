@@ -191,3 +191,99 @@ func TestUpdateUser(t *testing.T) {
 
 	})
 }
+
+func TestDeleteUser(t *testing.T) {
+	t.Run("DeleteUser正常系", func(t *testing.T) {
+		// DBを空にする
+		db.Delete(&users.User{})
+
+		// Userの登録
+		userDB := &UserPersistanceDB{db: db}
+		targetUser := users.User{
+			Name:  "user1",
+			Email: "user1@example.com",
+		}
+		createdUser, _ := userDB.CreateUser(targetUser)
+
+		// User情報の削除
+		err := userDB.DeleteUser(*createdUser)
+		
+		if err != nil {
+			t.Errorf("Delete failed: %v", err)
+		}
+	})
+
+	t.Run("DeleteUser異常系_IDがゼロ", func(t *testing.T) {
+		// DBを空にする
+		db.Delete(&users.User{})
+
+		// Userの登録
+		userDB := &UserPersistanceDB{db: db}
+		targetUser := users.User{
+			Name:  "user1",
+			Email: "user1@example.com",
+		}
+		_, _ = userDB.CreateUser(targetUser)
+
+		// DBの登録数を取得
+		var prevCount = 0
+		db.Model(&users.User{}).Count(&prevCount)
+
+		// User情報の削除(IDが異常)
+		err := userDB.DeleteUser(users.User{})
+		
+		if err == nil {
+			t.Errorf("Deleting should fail if the ID is zero: %v", err)
+		} else if err.Error() != "user ID is invalid" {
+			t.Errorf("Error message is invalid: %v", err)
+		}
+
+		// DBの登録数が変わっていないことを確認
+		var afterCount = 0
+		db.Model(&users.User{}).Count(&afterCount)
+
+		confirmBeforeAndAfter(t, prevCount, afterCount)
+	})
+
+	t.Run("DeleteUser異常系_IDが存在しない", func(t *testing.T) {
+		// DBを空にする
+		db.Delete(&users.User{})
+
+		// Userの登録
+		userDB := &UserPersistanceDB{db: db}
+		targetUser := users.User{
+			Name:  "user1",
+			Email: "user1@example.com",
+		}
+		createduser, _ := userDB.CreateUser(targetUser)
+
+		// DBの登録数を取得
+		var prevCount = 0
+		db.Model(&users.User{}).Count(&prevCount)
+
+		// User情報の削除(IDが異常)
+		createduser.ID++		// 存在しないIDを作成
+		err := userDB.DeleteUser(*createduser)
+		
+		if err == nil {
+			t.Errorf("Deleting should fail if the ID is invalid: %v", err)
+		}
+
+		// DBの登録数が変わっていないことを確認
+		var afterCount = 0
+		db.Model(&users.User{}).Count(&afterCount)
+
+		if afterCount != prevCount {
+			t.Errorf("DB record should be the same between before and after the Delete: before => %v, after => %v", prevCount, afterCount)
+		}
+	})
+}
+
+// confirmBeforeAndAfter compares previous value and after value.
+func confirmBeforeAndAfter(t *testing.T, prev int, after int) {
+	t.Helper()
+
+	if prev != after {
+		t.Errorf("DB record should be the same between before and after the Delete: before => %v, after => %v", prev, after)
+	}
+}

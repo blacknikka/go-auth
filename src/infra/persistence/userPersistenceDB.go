@@ -64,3 +64,13 @@ func (userDB UserPersistanceDB) UpdateUser(user users.User) (*users.User, error)
 		})
 	return &user, nil
 }
+
+// DeleteUser ユーザー削除
+func (userDB UserPersistanceDB) DeleteUser(user users.User) (error) {
+	if user.ID <= 0 {
+		return errors.New("user ID is invalid")
+	}
+
+	userDB.db.Model(&user).Delete(&user)
+	return nil
+}
