@@ -8,10 +8,12 @@ import (
 	"testing"
 
 	"github.com/blacknikka/go-auth/domain/models/users"
+	"github.com/blacknikka/go-auth/usecases"
 )
 
 // for mock
 type fakeUserUseCase struct {
+	usecases.UserUseCase
 	FakeGetAll func() (*[]users.User, error)
 }
 
