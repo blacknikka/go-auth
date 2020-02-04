@@ -69,8 +69,6 @@ func (userDB UserPersistanceDB) UpdateUser(user users.User) (*users.User, error)
 			Email: user.Email,
 		})
 
-	userDB.db.Save(&user)
-
 	return &user, nil
 }
 
