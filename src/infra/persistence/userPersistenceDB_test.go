@@ -205,12 +205,21 @@ func TestDeleteUser(t *testing.T) {
 		}
 		createdUser, _ := userDB.CreateUser(targetUser)
 
+		// DBの登録数を取得
+		var prevCount = 0
+		db.Model(&users.User{}).Count(&prevCount)
+		
 		// User情報の削除
 		err := userDB.DeleteUser(*createdUser)
 		
 		if err != nil {
 			t.Errorf("Delete failed: %v", err)
 		}
+
+		var afterCount = 0
+		db.Model(&users.User{}).Count(&afterCount)
+
+		confirmBeforeAndAfter(t, prevCount - 1, afterCount)
 	})
 
 	t.Run("DeleteUser異常系_IDがゼロ", func(t *testing.T) {
@@ -267,15 +276,15 @@ func TestDeleteUser(t *testing.T) {
 		
 		if err == nil {
 			t.Errorf("Deleting should fail if the ID is invalid: %v", err)
+		} else if err.Error() != "ID doesn't exist" {
+			t.Errorf("Error message is invalid: %v", err)
 		}
 
 		// DBの登録数が変わっていないことを確認
 		var afterCount = 0
 		db.Model(&users.User{}).Count(&afterCount)
 
-		if afterCount != prevCount {
-			t.Errorf("DB record should be the same between before and after the Delete: before => %v, after => %v", prevCount, afterCount)
-		}
+		confirmBeforeAndAfter(t, prevCount, afterCount)
 	})
 }
 

@@ -58,19 +58,27 @@ func (userDB UserPersistanceDB) UpdateUser(user users.User) (*users.User, error)
 	}
 
 	userDB.db.Model(&user).Updates(
-		map[string]interface{} {
-				"name": user.Name,
-				"Email": user.Email,
+		map[string]interface{}{
+			"name":  user.Name,
+			"Email": user.Email,
 		})
 	return &user, nil
 }
 
 // DeleteUser ユーザー削除
-func (userDB UserPersistanceDB) DeleteUser(user users.User) (error) {
+func (userDB UserPersistanceDB) DeleteUser(user users.User) error {
 	if user.ID <= 0 {
 		return errors.New("user ID is invalid")
 	}
 
-	userDB.db.Model(&user).Delete(&user)
+	if err := userDB.db.First(&user).Error; err != nil {
+		// not exists
+		return errors.New("ID doesn't exist")
+	  }
+
+	if err := userDB.db.Model(&user).Delete(&user).Error; err != nil {
+		return errors.New("Delete failed")
+	}
+
 	return nil
 }
