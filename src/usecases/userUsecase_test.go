@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/blacknikka/go-auth/domain/models/users"
@@ -41,11 +42,10 @@ func TestGetAll(t *testing.T) {
 	t.Run("GetAll正常系", func(t *testing.T) {
 		spyUserUsecase := &fakeUserRepository{
 			FakeGetAll: func() (*[]users.User, error) {
-				fakeUsers := []users.User{
+				return &[]users.User{
 					users.User{},
 					users.User{},
-				}
-				return &fakeUsers, nil
+				}, nil
 			},
 		}
 
@@ -58,7 +58,28 @@ func TestGetAll(t *testing.T) {
 		}
 
 		if resultUsers == nil {
-			t.Errorf("Returned USERS shouldn't nil: %v", resultUsers)
+			t.Errorf("Returned USERS shouldn't be nil: %v", resultUsers)
+		}
+	})
+
+	t.Run("GetAll異常系", func(t *testing.T) {
+		spyUserUsecase := &fakeUserRepository{
+			FakeGetAll: func() (*[]users.User, error) {
+				return nil, errors.New("something error")
+			},
+		}
+
+		usecase := NewUserUseCase(spyUserUsecase)
+
+		// 何かのエラーが発生する
+		resultUsers, err := usecase.GetAll()
+
+		if err == nil {
+			t.Errorf("err shouldn't be nil: %v", err)
+		}
+
+		if resultUsers != nil {
+			t.Errorf("Returned USERS should be nil: %v", resultUsers)
 		}
 	})
 }
