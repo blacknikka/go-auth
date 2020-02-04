@@ -15,6 +15,10 @@ var (
 // UserUseCase Userのユースケース
 type UserUseCase interface {
 	GetAll() (*[]users.User, error)
+	CreateUser(users.User) (*users.User, error)
+	FindByID(int) (*users.User, error)
+	UpdateUser(users.User) (*users.User, error)
+	DeleteUser(users.User) error
 }
 
 type userUseCase struct {
@@ -40,4 +44,19 @@ func (uu userUseCase) GetAll() (*[]users.User, error) {
 // CreateUser ユーザを作成する
 func (uu userUseCase) CreateUser(user users.User) (*users.User, error) {
 	return uu.userRepository.CreateUser(user)
+}
+
+// CreateUser ユーザを探す
+func (uu userUseCase) FindByID(id int) (*users.User, error) {
+	return uu.userRepository.FindByID(id)
+}
+
+// UpdateUser ユーザ情報を更新
+func (uu userUseCase) UpdateUser(user users.User) (*users.User, error) {
+	return uu.userRepository.UpdateUser(user)
+}
+
+// DeleteUser ユーザ情報を削除
+func (uu userUseCase) DeleteUser(user users.User) error {
+	return uu.userRepository.DeleteUser(user)
 }
