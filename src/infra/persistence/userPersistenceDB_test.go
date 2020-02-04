@@ -164,11 +164,11 @@ func TestUpdateUser(t *testing.T) {
 		}
 		createdUser, _ := userDB.CreateUser(targetUser)
 
-		// User情報の更新
-		targetUser.Name = "my-name"
+		// User情報の更新(Name)
+		createdUser.Name = "my-name"
 		updatedUser, err := userDB.UpdateUser(*createdUser)
 
-		if updatedUser.Name != "my-name" && 
+		if updatedUser.Name != "my-name" || 
 			updatedUser.Email != "user1@example.com" {
 			t.Errorf("Update failed: %v", updatedUser)
 		}
@@ -177,10 +177,11 @@ func TestUpdateUser(t *testing.T) {
 			t.Errorf("err should be nil: %v", err)
 		}
 
+		// Email更新
 		updatedUser.Email = "my-name@example.com"
 		updatedUser, err = userDB.UpdateUser(*updatedUser)
 
-		if updatedUser.Name != "my-name" && 
+		if updatedUser.Name != "my-name" ||
 			updatedUser.Email != "my-name@example.com" {
 			t.Errorf("Update failed: %v", updatedUser)
 		}
@@ -189,6 +190,89 @@ func TestUpdateUser(t *testing.T) {
 			t.Errorf("err should be nil: %v", err)
 		}
 
+		// 検索してレコードを確認
+		resultForFind, _ := userDB.FindByID(int(createdUser.ID))
+		if resultForFind.Name != "my-name" ||
+		resultForFind.Email != "my-name@example.com" {
+			t.Errorf("Update failed: %v", resultForFind)
+		}
+	})
+
+	t.Run("UpdateUser異常系_IDがゼロ", func(t *testing.T) {
+		// DBを空にする
+		db.Delete(&users.User{})
+
+		// Userの登録
+		userDB := &UserPersistanceDB{db: db}
+		targetUser := users.User{
+			Name:  "user1",
+			Email: "user1@example.com",
+		}
+		createdUser, _ := userDB.CreateUser(targetUser)
+
+		// ID保存（あとで検索するので）
+		createdID := createdUser.ID
+
+		// User情報の更新(IDゼロに矯正)
+		createdUser.ID = 0
+		createdUser.Name = "my-name"
+		_, err := userDB.UpdateUser(*createdUser)
+
+		if err == nil {
+			t.Errorf("Error shouldn't be nil: %v", err)
+		}
+
+		if err.Error() != "user ID is invalid" {
+			t.Errorf("Error message is invalid: %v", err)
+		}
+
+		// 検索して値が変わっていないことを確認
+		resultForFind, _ := userDB.FindByID(int(createdID))
+
+		if resultForFind.Name != "user1" ||
+		resultForFind.Email != "user1@example.com" {
+			t.Errorf("Values should be the same between before and after: %v", resultForFind)
+		}
+	})
+
+	t.Run("UpdateUser異常系_IDが存在しない", func(t *testing.T) {
+		// DBを空にする
+		db.Delete(&users.User{})
+
+		// Userの登録
+		userDB := &UserPersistanceDB{db: db}
+		targetUser := users.User{
+			Name:  "user1",
+			Email: "user1@example.com",
+		}
+		createdUser, _ := userDB.CreateUser(targetUser)
+
+		// IDを保存
+		createdID := createdUser.ID
+
+		// 存在しないIDを作成
+		createdUser.ID++
+
+		// User情報の更新(IDゼロに矯正)
+		createdUser.Name = "my-name"
+		createdUser.Email = "my-name@example.com"
+		_, err := userDB.UpdateUser(*createdUser)
+
+		if err == nil {
+			t.Errorf("Error shouldn't be nil: %v", err)
+		}
+
+		if err.Error() != "ID doesn't exist" {
+			t.Errorf("Error message is invalid: %v", err)
+		}
+
+		// 検索して値が変わっていないことを確認
+		resultForFind, _ := userDB.FindByID(int(createdID))
+
+		if resultForFind.Name != "user1" ||
+		resultForFind.Email != "user1@example.com" {
+			t.Errorf("Values should be the same between before and after: %v", resultForFind)
+		}
 	})
 }
 
