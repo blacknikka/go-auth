@@ -72,7 +72,9 @@ jobs:
           command: |
             docker-compose exec app env
             docker-compose ps
-            sleep 5; docker-compose exec app sh -c "PATH=$PATH:/go/src/github.com/blacknikka/go-auth sh ./migrate/up.sh"
+            sleep 5
+            docker-compose exec app sh -c "ping -c 3 mysql"
+            docker-compose exec app sh -c "PATH=$PATH:/go/src/github.com/blacknikka/go-auth sh ./migrate/up.sh"
           working_directory: /home/circleci/project
 
       # test
