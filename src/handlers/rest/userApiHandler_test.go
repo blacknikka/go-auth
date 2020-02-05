@@ -45,7 +45,7 @@ func TestUserController(t *testing.T) {
 
 		userHandler := NewUserHandler(spy)
 
-		req, err := http.NewRequest("GET", "/user", nil)
+		req, err := http.NewRequest("GET", "/api/user", nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -102,7 +102,7 @@ func TestUserController(t *testing.T) {
 		// inject a mock object.
 		userHandler := NewUserHandler(spy)
 
-		req, err := http.NewRequest("GET", "/user", nil)
+		req, err := http.NewRequest("GET", "/api/user", nil)
 		if err != nil {
 			t.Fatal(err)
 		}
