@@ -1,9 +1,10 @@
 package html
 
 import (
+	"fmt"
+	"html/template"
 	"log"
 	"net/http"
-	"text/template"
 
 	"github.com/blacknikka/go-auth/usecases"
 )
@@ -25,12 +26,21 @@ func NewUserHTMLHandler(uu usecases.UserUseCase) UserHTMLHandler {
 }
 
 func (uh userHTMLHandler) ShowAllUsers(w http.ResponseWriter, r *http.Request) {
-	t, err := template.New("foo").Parse(`{{define "T"}}Hello, {{.}}!{{end}}`)
+	fileForTemplate := "./handlers/html/templates/showAllUsers.html.tpl"
+
+	t, err := template.ParseFiles(fileForTemplate)
 	if err != nil {
+		fmt.Fprintf(w, "error: %v", err)
 		log.Fatal(err)
 	}
 
-	if err := t.ExecuteTemplate(w, "T", "<script>alert('you have been pwned')</script>"); err != nil {
+	usersToShow, err := uh.userUseCase.GetAll()
+	if err != nil {
+		fmt.Fprintf(w, "error: %v", err)
+		log.Fatal(err)
+	}
+
+	if err := t.Execute(w, usersToShow); err != nil {
 		log.Fatal(err)
 	}
 }
