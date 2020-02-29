@@ -14,7 +14,8 @@ services:
       - apparmor:unconfined
     cap_add:
       - SYS_PTRACE
-    command: realize start --run --no-config
+    # command: realize start --run --no-config
+    command: /bin/bash
   mysql:
     build: ./docker/mysql
     env_file: .env
