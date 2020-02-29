@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/blacknikka/go-auth/domain/models/users"
 	"github.com/blacknikka/go-auth/usecases"
 )
 
@@ -35,9 +34,10 @@ func (uh userHTMLHandler) ShowAllUsers(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	usersToShow := []users.User{
-		{ID: 1, Name: "Name1", Email: "email"},
-		{ID: 2, Name: "Name2", Email: "email2"},
+	usersToShow, err := uh.userUseCase.GetAll()
+	if err != nil {
+		fmt.Fprintf(w, "error: %v", err)
+		log.Fatal(err)
 	}
 
 	if err := t.Execute(w, usersToShow); err != nil {
