@@ -1,6 +1,7 @@
 package file
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/blacknikka/go-auth/domain/models/files"
@@ -45,6 +46,62 @@ func TestCreate(t *testing.T) {
 
 		if creationResult == nil {
 			t.Errorf("Returned File shouldn't be nil: %v", creationResult)
+		}
+	})
+}
+
+func TestFindByID(t *testing.T) {
+	t.Run("FindByID正常系", func(t *testing.T) {
+		fileForFindByID := files.File{
+			ID:   1,
+			Name: "fileName.jpg",
+			Data: []byte{0x01, 0x02},
+		}
+		spyFileRepository := &fakeFileRepository{
+			FakeFindByID: func(id int) (*files.File, error) {
+				return &fileForFindByID, nil
+			},
+		}
+
+		usecase := NewFileUseCase(spyFileRepository)
+
+		foundResult, err := usecase.FindByID(int(fileForFindByID.ID))
+
+		if err != nil {
+			t.Errorf("err should be nil: %v", err)
+		}
+
+		if foundResult == nil {
+			t.Errorf("foundResult shouldn't be nil: %v", foundResult)
+		}
+
+		if foundResult.ID != fileForFindByID.ID {
+			t.Errorf("The ID should be same between two targets: %v, %v", foundResult.ID, fileForFindByID.ID)
+		}
+	})
+
+	t.Run("FindByID異常系", func(t *testing.T) {
+		fileForFindByID := files.File{
+			ID:   1,
+			Name: "fileName.jpg",
+			Data: []byte{0x01, 0x02},
+		}
+		spyFileRepository := &fakeFileRepository{
+			FakeFindByID: func(id int) (*files.File, error) {
+				return nil, errors.New("error")
+			},
+		}
+
+		usecase := NewFileUseCase(spyFileRepository)
+
+		foundResult, err := usecase.FindByID(int(fileForFindByID.ID + 1))
+
+		if err == nil {
+			t.Errorf("err shouldn't be nil: %v", err)
+		}
+
+		if foundResult != nil {
+			t.Errorf("foundResult should be nil: %v", foundResult)
 		}
 	})
 }
