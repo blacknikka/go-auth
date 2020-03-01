@@ -1,4 +1,4 @@
-package html
+package user
 
 import (
 	"fmt"

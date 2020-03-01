@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/blacknikka/go-auth/domain/models/files"
 	fileUsecase "github.com/blacknikka/go-auth/usecases/file"
 )
 
@@ -25,4 +26,7 @@ func NewFileHTMLHandler(fu fileUsecase.FileUseCase) FileHTMLHandler {
 
 func (fh fileHTMLHandler) UploadFile(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello World")
+
+	// call create function.
+	fh.fileUsecase.Create(files.File{})
 }
