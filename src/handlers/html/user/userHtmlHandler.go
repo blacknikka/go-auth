@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/blacknikka/go-auth/usecases"
+	userUsecase "github.com/blacknikka/go-auth/usecases/user"
 )
 
 // UserHTMLHandler UserのHtmlハンドラ
@@ -15,11 +15,11 @@ type UserHTMLHandler interface {
 }
 
 type userHTMLHandler struct {
-	userUseCase usecases.UserUseCase
+	userUseCase userUsecase.UserUseCase
 }
 
 // NewUserHTMLHandler UserのHTMLハンドラを返す
-func NewUserHTMLHandler(uu usecases.UserUseCase) UserHTMLHandler {
+func NewUserHTMLHandler(uu userUsecase.UserUseCase) UserHTMLHandler {
 	return &userHTMLHandler{
 		userUseCase: uu,
 	}

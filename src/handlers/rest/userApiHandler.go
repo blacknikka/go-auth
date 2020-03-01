@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/blacknikka/go-auth/usecases"
+	userUsecase "github.com/blacknikka/go-auth/usecases/user"
 )
 
 // UserHandler Userのハンドラ
@@ -13,7 +13,7 @@ type UserHandler interface {
 }
 
 type userHandler struct {
-	userUseCase usecases.UserUseCase
+	userUseCase userUsecase.UserUseCase
 }
 
 // ------------------
@@ -35,7 +35,7 @@ type Response struct {
 }
 
 // NewUserHandler Userのハンドラを返す
-func NewUserHandler(uu usecases.UserUseCase) UserHandler {
+func NewUserHandler(uu userUsecase.UserUseCase) UserHandler {
 	return &userHandler{
 		userUseCase: uu,
 	}
