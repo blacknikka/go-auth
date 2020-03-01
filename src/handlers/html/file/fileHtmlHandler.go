@@ -13,13 +13,13 @@ type FileHTMLHandler interface {
 }
 
 type fileHTMLHandler struct {
-	fileUseCase fileUsecase.FileUseCase
+	fileUsecase fileUsecase.FileUseCase
 }
 
 // NewFileHTMLHandler FileのHTMLハンドラを返す
 func NewFileHTMLHandler(fu fileUsecase.FileUseCase) FileHTMLHandler {
 	return &fileHTMLHandler{
-		fileUseCase: fu,
+		fileUsecase: fu,
 	}
 }
 
