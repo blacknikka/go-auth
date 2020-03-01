@@ -1,10 +1,11 @@
-package persistence
+package user
 
 import (
 	"os"
 	"testing"
 
 	"github.com/blacknikka/go-auth/domain/models/users"
+	"github.com/blacknikka/go-auth/infra/persistence"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 )
@@ -13,7 +14,7 @@ var db *gorm.DB
 
 func setup() {
 	// DBに接続
-	conn := NewConnectToDB(NewDBConnectionFactory())
+	conn := persistence.NewConnectToDB(persistence.NewDBConnectionFactory())
 	var err error
 	db, err = conn.Connect()
 	if err != nil {
@@ -96,7 +97,7 @@ func TestFindByID(t *testing.T) {
 
 		if createdUser.ID <= 0 {
 			t.Errorf("created ID should be positive value: %v",
-			createdUser.ID)
+				createdUser.ID)
 		}
 
 		// FindByID
@@ -168,7 +169,7 @@ func TestUpdateUser(t *testing.T) {
 		createdUser.Name = "my-name"
 		updatedUser, err := userDB.UpdateUser(*createdUser)
 
-		if updatedUser.Name != "my-name" || 
+		if updatedUser.Name != "my-name" ||
 			updatedUser.Email != "user1@example.com" {
 			t.Errorf("Update failed: %v", updatedUser)
 		}
@@ -193,7 +194,7 @@ func TestUpdateUser(t *testing.T) {
 		// 検索してレコードを確認
 		resultForFind, _ := userDB.FindByID(int(createdUser.ID))
 		if resultForFind.Name != "my-name" ||
-		resultForFind.Email != "my-name@example.com" {
+			resultForFind.Email != "my-name@example.com" {
 			t.Errorf("Update failed: %v", resultForFind)
 		}
 	})
@@ -230,7 +231,7 @@ func TestUpdateUser(t *testing.T) {
 		resultForFind, _ := userDB.FindByID(int(createdID))
 
 		if resultForFind.Name != "user1" ||
-		resultForFind.Email != "user1@example.com" {
+			resultForFind.Email != "user1@example.com" {
 			t.Errorf("Values should be the same between before and after: %v", resultForFind)
 		}
 	})
@@ -270,7 +271,7 @@ func TestUpdateUser(t *testing.T) {
 		resultForFind, _ := userDB.FindByID(int(createdID))
 
 		if resultForFind.Name != "user1" ||
-		resultForFind.Email != "user1@example.com" {
+			resultForFind.Email != "user1@example.com" {
 			t.Errorf("Values should be the same between before and after: %v", resultForFind)
 		}
 	})
@@ -292,10 +293,10 @@ func TestDeleteUser(t *testing.T) {
 		// DBの登録数を取得
 		var prevCount = 0
 		db.Model(&users.User{}).Count(&prevCount)
-		
+
 		// User情報の削除
 		err := userDB.DeleteUser(*createdUser)
-		
+
 		if err != nil {
 			t.Errorf("Delete failed: %v", err)
 		}
@@ -303,7 +304,7 @@ func TestDeleteUser(t *testing.T) {
 		var afterCount = 0
 		db.Model(&users.User{}).Count(&afterCount)
 
-		confirmBeforeAndAfter(t, prevCount - 1, afterCount)
+		confirmBeforeAndAfter(t, prevCount-1, afterCount)
 	})
 
 	t.Run("DeleteUser異常系_IDがゼロ", func(t *testing.T) {
@@ -324,7 +325,7 @@ func TestDeleteUser(t *testing.T) {
 
 		// User情報の削除(IDが異常)
 		err := userDB.DeleteUser(users.User{})
-		
+
 		if err == nil {
 			t.Errorf("Deleting should fail if the ID is zero: %v", err)
 		} else if err.Error() != "user ID is invalid" {
@@ -355,9 +356,9 @@ func TestDeleteUser(t *testing.T) {
 		db.Model(&users.User{}).Count(&prevCount)
 
 		// User情報の削除(IDが異常)
-		createduser.ID++		// 存在しないIDを作成
+		createduser.ID++ // 存在しないIDを作成
 		err := userDB.DeleteUser(*createduser)
-		
+
 		if err == nil {
 			t.Errorf("Deleting should fail if the ID is invalid: %v", err)
 		} else if err.Error() != "ID doesn't exist" {

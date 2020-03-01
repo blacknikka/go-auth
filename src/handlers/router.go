@@ -6,6 +6,7 @@ import (
 	userHTML "github.com/blacknikka/go-auth/handlers/html/user"
 	"github.com/blacknikka/go-auth/handlers/rest"
 	"github.com/blacknikka/go-auth/infra/persistence"
+	"github.com/blacknikka/go-auth/infra/persistence/user"
 	"github.com/blacknikka/go-auth/usecases"
 )
 
@@ -17,7 +18,7 @@ func InitializeRouting() {
 		panic(err.Error())
 	}
 
-	userPersistence := persistence.NewUserPersistence(db)
+	userPersistence := user.NewUserPersistence(db)
 	userUseCase := usecases.UserUseCase(userPersistence)
 	userHandler := rest.NewUserHandler(userUseCase)
 	userHTMLHandler := userHTML.NewUserHTMLHandler(userUseCase)
