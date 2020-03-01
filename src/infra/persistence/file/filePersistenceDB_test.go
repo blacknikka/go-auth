@@ -2,6 +2,7 @@ package file
 
 import (
 	"os"
+	"reflect"
 	"testing"
 
 	"github.com/blacknikka/go-auth/domain/models/files"
@@ -36,7 +37,7 @@ func TestMain(m *testing.M) {
 	os.Exit(ret)
 }
 
-func TestCreateUser(t *testing.T) {
+func TestCreate(t *testing.T) {
 	t.Run("Create正常系", func(t *testing.T) {
 		setup()
 
@@ -71,6 +72,45 @@ func TestCreateUser(t *testing.T) {
 
 		if createdFile.ID <= 0 {
 			t.Errorf("created ID should be a positive value: %v", createdFile.ID)
+		}
+
+		teardown()
+	})
+}
+
+func TestFindByID(t *testing.T) {
+	t.Run("FindByID正常系", func(t *testing.T) {
+		setup()
+
+		// DBを空にする
+		db.Delete(&files.File{})
+
+		// DBの登録数を取得
+		// Create
+		fileDB := &FilePersistanceDB{db: db}
+		file := files.File{
+			Name: "file-name1.jpg",
+			Data: []byte{0x00, 0x01},
+		}
+		createdFile, _ := fileDB.Create(file)
+
+		// FindByID (test stub)
+		found, err := fileDB.FindByID(int(createdFile.ID))
+
+		if err != nil {
+			t.Errorf("err should be nil: %v", err)
+		}
+
+		if found.ID != createdFile.ID {
+			t.Errorf("Found ID should be same as created ID: %v, %v", found.ID, createdFile.ID)
+		}
+
+		if found.Name != createdFile.Name {
+			t.Errorf("Found Name should be same as created Name: %v, %v", found.Name, createdFile.Name)
+		}
+
+		if reflect.DeepEqual(found.Data, createdFile.Data) != true {
+			t.Errorf("Found Data should be same as created Data: %v, %v", found.Data, createdFile.Data)
 		}
 
 		teardown()
