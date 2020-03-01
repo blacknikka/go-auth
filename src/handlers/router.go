@@ -3,11 +3,14 @@ package handlers
 import (
 	"net/http"
 
+	fileHTML "github.com/blacknikka/go-auth/handlers/html/file"
 	userHTML "github.com/blacknikka/go-auth/handlers/html/user"
 	"github.com/blacknikka/go-auth/handlers/rest"
 	"github.com/blacknikka/go-auth/infra/persistence"
-	"github.com/blacknikka/go-auth/infra/persistence/user"
-	"github.com/blacknikka/go-auth/usecases"
+	filePersistence "github.com/blacknikka/go-auth/infra/persistence/file"
+	userPersistence "github.com/blacknikka/go-auth/infra/persistence/user"
+	fileUsecase "github.com/blacknikka/go-auth/usecases/file"
+	userUsecase "github.com/blacknikka/go-auth/usecases/user"
 )
 
 // InitializeRouting routing
@@ -18,12 +21,18 @@ func InitializeRouting() {
 		panic(err.Error())
 	}
 
-	userPersistence := user.NewUserPersistence(db)
-	userUseCase := usecases.UserUseCase(userPersistence)
-	userHandler := rest.NewUserHandler(userUseCase)
-	userHTMLHandler := userHTML.NewUserHTMLHandler(userUseCase)
+	userPersistence := userPersistence.NewUserPersistence(db)
+	usecaseForUser := userUsecase.UserUseCase(userPersistence)
+	userHandler := rest.NewUserHandler(usecaseForUser)
+	userHTMLHandler := userHTML.NewUserHTMLHandler(usecaseForUser)
 
 	http.HandleFunc("/hello", HelloServer)
 	http.HandleFunc("/api/user", userHandler.Index)
 	http.HandleFunc("/user/all", userHTMLHandler.ShowAllUsers)
+
+	filePersistence := filePersistence.NewFilePersistence(db)
+	usecaseForFile := fileUsecase.FileUseCase(filePersistence)
+	fileHTMLHandler := fileHTML.NewFileHTMLHandler(usecaseForFile)
+
+	http.HandleFunc("/file/upload", fileHTMLHandler.UploadFile)
 }

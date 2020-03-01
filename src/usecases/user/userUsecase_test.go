@@ -1,4 +1,4 @@
-package usecases
+package user
 
 import (
 	"errors"
@@ -40,7 +40,7 @@ func (s *fakeUserRepository) DeleteUser(user users.User) error {
 
 func TestGetAll(t *testing.T) {
 	t.Run("GetAll正常系", func(t *testing.T) {
-		spyUserUsecase := &fakeUserRepository{
+		spyUserRepository := &fakeUserRepository{
 			FakeGetAll: func() (*[]users.User, error) {
 				return &[]users.User{
 					users.User{},
@@ -49,7 +49,7 @@ func TestGetAll(t *testing.T) {
 			},
 		}
 
-		usecase := NewUserUseCase(spyUserUsecase)
+		usecase := NewUserUseCase(spyUserRepository)
 
 		resultUsers, err := usecase.GetAll()
 
@@ -63,13 +63,13 @@ func TestGetAll(t *testing.T) {
 	})
 
 	t.Run("GetAll異常系", func(t *testing.T) {
-		spyUserUsecase := &fakeUserRepository{
+		spyUserRepository := &fakeUserRepository{
 			FakeGetAll: func() (*[]users.User, error) {
 				return nil, errors.New("something error")
 			},
 		}
 
-		usecase := NewUserUseCase(spyUserUsecase)
+		usecase := NewUserUseCase(spyUserRepository)
 
 		// 何かのエラーが発生する
 		resultUsers, err := usecase.GetAll()
