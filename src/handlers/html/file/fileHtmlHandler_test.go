@@ -25,6 +25,23 @@ func (s *fakeFileUseCase) FindByID(id int) (*files.File, error) {
 }
 
 func TestFileHTMLHandler(t *testing.T) {
+	t.Run("UploadFile異常系_POSTではない", func(t *testing.T) {
+		spy := &fakeFileUseCase{}
+		fileHandler := NewFileHTMLHandler(spy)
+		req, err := http.NewRequest("GET", "/file/upload_request", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fileHandler.UploadFileForm)
+		handler.ServeHTTP(rr, req)
+
+		if status := rr.Code; status != http.StatusBadRequest {
+			t.Errorf("handler should return bad request: got %v want %v",
+				status, http.StatusBadRequest)
+		}
+	})
+
 	t.Run("UploadFile正常系", func(t *testing.T) {
 		hasBeenCalled := false
 
@@ -45,14 +62,14 @@ func TestFileHTMLHandler(t *testing.T) {
 
 		fileHandler := NewFileHTMLHandler(spy)
 
-		req, err := http.NewRequest("POST", "/file/upload", nil)
+		req, err := http.NewRequest("POST", "/file/upload_request", nil)
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(fileHandler.UploadFile)
+		handler := http.HandlerFunc(fileHandler.UploadFileForm)
 
 		// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
 		// directly and pass in our Request and ResponseRecorder.

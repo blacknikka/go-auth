@@ -5,8 +5,9 @@
     <title>{{ .Title }}</title>
   </head>
   <body>
-    <form action="/upload" enctype="multipart/form-data" method="post">
-      <input type="file" name="upload" id="upload" multiple="multiple">
+    <form action="/file/upload_request" enctype="multipart/form-data" method="post">
+      <input type="text" name="file_name" id="name" multiple="multiple">
+      <input type="file" name="up_data" id="upload" multiple="multiple">
       <input type="submit" value="Upload file" />
     </form>
   </body>
