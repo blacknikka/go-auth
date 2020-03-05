@@ -106,6 +106,7 @@ func (fh fileHTMLHandler) UploadFileRequest(w http.ResponseWriter, r *http.Reque
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	r.ParseForm()
 
 	file, fileHeader, err := r.FormFile("up_data")
 	defer file.Close()
