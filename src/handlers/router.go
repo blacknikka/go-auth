@@ -34,5 +34,8 @@ func InitializeRouting() {
 	usecaseForFile := fileUsecase.FileUseCase(filePersistence)
 	fileHTMLHandler := fileHTML.NewFileHTMLHandler(usecaseForFile)
 
-	http.HandleFunc("/file/upload", fileHTMLHandler.UploadFile)
+	http.HandleFunc("/file/find_form", fileHTMLHandler.FindFileForm)
+	http.HandleFunc("/file/find_request", fileHTMLHandler.FindFileRequest)
+	http.HandleFunc("/file/upload_form", fileHTMLHandler.UploadFileForm)
+	http.HandleFunc("/file/upload_request", fileHTMLHandler.UploadFileRequest)
 }
